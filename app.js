@@ -1,4 +1,4 @@
-/// <reference path="babylon.d.ts" />
+/// <reference path="./libs/babylon.d.ts" />
 
 class Game {
     constructor() {
