@@ -41,6 +41,10 @@ class Game {
         this.direction = new BABYLON.Vector3();
         this.prevTime = performance.now();
 
+        BABYLON.SceneLoader.Append('./assets/', 'sambaDancing.gltf', this.scene, function(asset) {
+            console.log('hi');
+        });
+
         this.init();
     }
 
@@ -55,7 +59,7 @@ class Game {
             switch ( e.keyCode ) {
                 case 87: // w
                         game.moveForward = true;
-                        // console.log(game.moveForward);
+                        console.log(game.moveForward);
                         break;
     
                 case 65: // a
@@ -109,6 +113,8 @@ class Game {
                     }
         });
 
+        console.log(this.camera);
+
         this.engine.runRenderLoop(function() {
             game.scene.render();
             game.animate();
@@ -121,7 +127,7 @@ class Game {
         var time = performance.now();
         var delta = ( time - game.prevTime ) / 1000;
 
-        // game.cameraMovement(delta);
+        game.cameraMovement(delta);
     }
 
     cameraMovement(delta) {
@@ -137,17 +143,14 @@ class Game {
         game.direction.normalize(); // this ensures consistent movements in all directions
 
         if ( game.moveForward || game.moveBackward ) {
-            game.velocity.z -= game.direction.z * 4000 * delta;
+            game.camera.position.z += game.direction.z * delta / 10;
         };
         if ( game.moveLeft || game.moveRight ) {
-            game.velocity.x -= game.direction.x * 4000 * delta;
+            game.camera.position.x += -game.direction.x * delta / 10;
         };
         if (game.moveUp || game.moveDown) {
-            game.velocity.y += game.direction.y * 4000 * delta;
+            game.camera.position.y += game.direction.y * delta / 10;
         }
 
-        game.camera.translateX(game.velocity.x * delta);
-        game.camera.translateY(game.velocity.y * delta);
-        game.camera.translateZ(game.velocity.z * delta);
     }
 }
