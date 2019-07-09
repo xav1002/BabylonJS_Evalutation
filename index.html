@@ -7,18 +7,68 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" type="text/css" media="screen" href="main.css">
         <script src="./libs/babylon.js"></script>
-        <script src="libs/babylon.glTFFileLoader.js"></script>
+        <!-- <script src="./libs/babylon.glTFFileLoader.js"></script> -->
         <script src="./libs/babylonjs.loaders.js"></script>
+        <scirpt src="./node_modules/babylonjs-procedural-textures/babylonjs.proceduralTextures.js"></scirpt>
     </head>
     <body>
         <canvas id="rendercanvas"></canvas>
 
-        <script src="app.js"></script>
+        <!-- <script src="app.js"></script> -->
 
         <script>
-            window.addEventListener('DOMContentLoaded', function() {
-                var game = new Game();
+            // window.addEventListener('DOMContentLoaded', function() {
+            //     var game = new Game();
+            // });
+
+            /**
+             * Buffer.bin required for gltf models; when converting from fbx to gltf maybe a buffer.bin is created?
+            */
+
+            var canvas = document.querySelector('#rendercanvas');
+
+            var createScene = function() {
+                var scene = new BABYLON.Scene(engine);
+
+                var assetsManager = new BABYLON.AssetsManager(scene);
+
+                var cylinder = new BABYLON.Mesh.CreateCylinder('mycylinder', 7, 2, 2, 12, 1, scene);
+                cylinder.position.set(10, 0, 0);
+
+                var material = new BABYLON.StandardMaterial('material', scene);
+
+                // var texture = new BABYLON.WoodProceduralTexture('texture', 1024, scene);
+
+                var texture = new BABYLON.Texture('./assets/barrelTexture.jpg', scene);
+
+                material.diffuseTexture = texture;
+                cylinder.material = material;
+
+                var environment = scene.createDefaultEnvironment({ enableGroundShadow: true, groundYBias: true });
+
+                var vrHelper = scene.createDefaultVRExperience({createDeviceOrientationCamera: false});
+
+                var dancingPerson = BABYLON.SceneLoader.Append("./assets/", "sambaDancing.gltf", scene, function(scene) {
+                    scene.createDefaultCameraOrLight(true, true, true);
+                });
+
+                console.log(dancingPerson);
+
+                return scene;
+            }
+
+            var engine = new BABYLON.Engine(canvas, true, {preserveDrawingBuffer: true, stencil: true});
+            var scene = createScene();
+
+            engine.runRenderLoop(function() {
+                if(scene) {
+                    scene.render();
+                }
             });
+
+            window.addEventListener('resize', function() {
+                engine.resize();
+            })
         </script>
     </body>
 </html>

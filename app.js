@@ -41,8 +41,16 @@ class Game {
         this.direction = new BABYLON.Vector3();
         this.prevTime = performance.now();
 
-        BABYLON.SceneLoader.Append('./assets/', 'sambaDancing.gltf', this.scene, function(asset) {
-            console.log('hi');
+        console.log(
+        navigator.getGamepads()
+        );
+
+        const game = this;
+
+        BABYLON.SceneLoader.Append("./", "sambaDancing.gltf", game.scene, function(asset) {
+            asset.createDefaultCameraOrLight(true, true, true);
+
+            asset.activeCamera.alpha += Math.PI;
         });
 
         this.init();
