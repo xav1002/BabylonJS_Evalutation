@@ -9,7 +9,7 @@
         <script src="./libs/babylon.js"></script>
         <!-- <script src="./libs/babylon.glTFFileLoader.js"></script> -->
         <script src="./libs/babylonjs.loaders.js"></script>
-        <scirpt src="./node_modules/babylonjs-procedural-textures/babylonjs.proceduralTextures.js"></scirpt>
+        <!-- <scirpt src="./node_modules/babylonjs-procedural-textures/babylonjs.proceduralTextures.js"></scirpt> -->
     </head>
     <body>
         <canvas id="rendercanvas"></canvas>
@@ -36,21 +36,11 @@
                 var scene = new BABYLON.Scene(engine);
                 scene.clearColor = new BABYLON.Color3(.1, .1, .3);
 
-                // cameras
-                var arcCamera = new BABYLON.ArcRotateCamera('arccamera', 0, 0, 0, BABYLON.Vector3.Zero(), scene);
-                arcCamera.attachControl(canvas, true);
-                arcCamera.setPosition(new BABYLON.Vector3(0, 10.0, -15));
-
-                var freeCamera = new BABYLON.FreeCamera('freecamera', new BABYLON.Vector3(0, 0, 5), scene);
-
-                var touchCamera = new BABYLON.TouchCamera('touchcamera', new BABYLON.Vector3(0, 0, 10), scene);
-
-                scene.activeCamera = freeCamera;
-                freeCamera.attachControl(canvas, true);
-
                 // lights
                 var light = new BABYLON.PointLight('pointlight', new BABYLON.Vector3(0, 30, 0), scene);
                 light.intensity = 1;
+                var hemisphericLight = new BABYLON.HemisphericLight('light', new BABYLON.Vector3(0, 1, 0), scene);
+                hemisphericLight.intensity = 1;
 
                 // materials
                 var material = new BABYLON.StandardMaterial('material', scene);
@@ -77,13 +67,16 @@
 
                 // 3D model
                 var dancingPerson = BABYLON.SceneLoader.Append("./assets/", "sambaDancing.gltf", scene, function(scene) {
-                    scene.createDefaultCameraOrLight(true, true, true);
-                    console.log(scene.meshes[4]);
-                    scene.meshes[4].position = new BABYLON.Vector3(0, 3, 0);
+                    // scene.createDefaultCameraOrLight(false, true, false);
+                    console.log(scene.meshes);
+                    // var dancing = scene.meshes.querySelector('#__root__');
+                    var dancing = scene.meshes[4];
+                    console.log(dancing);
+                    dancing.position = new BABYLON.Vector3(0, 3.5, 0);
                 });
 
                 // solid particle system
-                var ball = BABYLON.MeshBuilder.CreateSphere('ball', {diamter: 2, segments: 5}, scene);
+                var ball = BABYLON.MeshBuilder.CreateSphere('ball', {diameter: 2, segments: 5}, scene);
                 var sps = new BABYLON.SolidParticleSystem('sps', scene);
                 var posfunc = function(p) {
                     p.position = new BABYLON.Vector3(4, 0, 0);
@@ -98,7 +91,32 @@
                 // }
                 // sps.updatePhysics(ball);
 
-                console.log(dancingPerson);
+                // // cameras
+                var arcCamera = new BABYLON.ArcRotateCamera('arccamera', 0, 0, 0, BABYLON.Vector3.Zero(), scene);
+                arcCamera.attachControl(canvas, true);
+                arcCamera.setPosition(new BABYLON.Vector3(0, 10.0, -15));
+
+                var freeCamera = new BABYLON.FreeCamera('freecamera', new BABYLON.Vector3(0, 0, 5), scene);
+                freeCamera.id = 'freecamera';
+                freeCamera._isDisposed = false;
+                freeCamera.setTarget(new BABYLON.Vector3.Zero());
+                freeCamera.inputs.attached.keyboard.keysDown.push(83);
+                freeCamera.inputs.attached.keyboard.keysUp.push(87);
+                freeCamera.inputs.attached.keyboard.keysRight.push(68);
+                freeCamera.inputs.attached.keyboard.keysLeft.push(65);
+                console.log(freeCamera);
+
+                var touchCamera = new BABYLON.TouchCamera('touchcamera', new BABYLON.Vector3(0, 0, 10), scene);
+
+                var universalCamera = new BABYLON.UniversalCamera('universalcamera', new BABYLON.Vector3(0, 0, -10), scene);
+
+                // scene.cameras.push(arcCamera, freeCamera, touchCamera, universalCamera);
+
+                console.log(scene.cameras, scene.activeCamera.name);
+
+                scene.activeCamera = freeCamera;
+                // universalCamera.setTarget(BABYLON.Vector3.Zero());
+                freeCamera.attachControl(canvas, true);
 
                 return scene;
             }
